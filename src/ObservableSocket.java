@@ -66,14 +66,17 @@ public class ObservableSocket implements Runnable {
                     if (!Protocol.isCommand(command)) {
                         // Invalid message, throw it away and log
                         System.out.println("Invalid command sent: " + command);
-                    }
+                    } else {
+						// Read in the specified number of lines for this command
+						List<String> args = new ArrayList<>();
+						for (int i = 0; i < Protocol.commands.get(command); i++) {
+							// Add each line to an array of 'arguments' for the command
+							args.add(in.readLine());
+						}
 
-                    List<String> args = new ArrayList<>();
-                    for (int i = 0; i < Protocol.commands.get(command); i++) {
-                        args.add(in.readLine());
-                    }
-
-                    notifyHandlers(new Message(command, args));
+						// Notify all subscribed handlers of the new message
+						notifyHandlers(new Message(command, args));
+					}
                 }
             } catch (IOException e) {
                 System.out.println("Socket closed unexpectedly!");
